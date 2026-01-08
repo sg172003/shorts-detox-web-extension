@@ -8,7 +8,7 @@
   let lastUrl = location.href;
   let timerInterval = null;
 
-  /* ---------------- TAB AUDIO CONTROL ---------------- */
+  // ---------------- TAB AUDIO CONTROL ----------------
 
   function muteTab() {
     chrome.runtime.sendMessage({ type: "MUTE_TAB" });
@@ -18,7 +18,7 @@
     chrome.runtime.sendMessage({ type: "UNMUTE_TAB" });
   }
 
-  /* ---------------- STATE ---------------- */
+  // ---------------- STATE ----------------
 
   function defaultState() {
     return {
@@ -47,10 +47,58 @@
     chrome.storage.local.set({ shortsState: state });
   }
 
-  /* ---------------- BLOCK SCREEN ---------------- */
+  // ---------------- TIMER OVERLAY (SPA SAFE) ----------------
+
+  function getOrCreateOverlay() {
+    let overlay = document.getElementById("shorts-timer-overlay");
+    if (overlay) return overlay;
+
+    overlay = document.createElement("div");
+    overlay.id = "shorts-timer-overlay";
+    overlay.style.cssText = `
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#111;
+      color:white;
+      padding:12px;
+      border-radius:8px;
+      width:220px;
+      font-family:Arial;
+      z-index:999999;
+      box-shadow:0 0 10px rgba(0,0,0,0.5);
+    `;
+
+    overlay.innerHTML = `
+      <div style="font-size:13px;margin-bottom:6px;">
+        ⏱ Time left: <span id="timeText"></span>
+      </div>
+      <div style="background:#333;height:6px;border-radius:4px;">
+        <div id="bar" style="
+          background:#00ff99;
+          height:6px;
+          width:100%;
+          border-radius:4px;
+        "></div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function removeOverlay() {
+    const el = document.getElementById("shorts-timer-overlay");
+    if (el) el.remove();
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  // ---------------- BLOCK SCREEN ----------------
 
   function showBlockedScreen(state) {
-    muteTab(); // 🔇 GUARANTEED audio stop
+    muteTab();
+    removeOverlay();
 
     document.documentElement.innerHTML = `
       <head><title>Shorts Blocked</title></head>
@@ -94,11 +142,27 @@
       return;
     }
 
-    if (now < state.cooldownUntil) {
-      btn.disabled = true;
-      const mins = Math.ceil((state.cooldownUntil - now) / 60000);
-      warning.textContent = `⏳ Take a break. Try again in ${mins} minute(s).`;
-    }
+   if (now < state.cooldownUntil) {
+  btn.disabled = true;
+
+  const remainingMs = state.cooldownUntil - now;
+  const mins = Math.ceil(remainingMs / 60000);
+  warning.textContent = `⏳ Take a break. Try again in ${mins} minute(s).`;
+
+  // 🔑 AUTO-ENABLE BUTTON AFTER COOLDOWN
+  setTimeout(() => {
+    // Re-check state from storage to stay safe
+    loadState((latestState) => {
+      if (Date.now() >= latestState.cooldownUntil) {
+        btn.disabled = false;
+        warning.textContent = "";
+      }
+    });
+  }, remainingMs);
+
+  return;
+}
+
 
     btn.onclick = () => {
       const now = Date.now();
@@ -114,7 +178,7 @@
         return;
       }
 
-      unmuteTab(); // 🔊 allow sound again
+      unmuteTab();
 
       state.allowClicks += 1;
       state.usedMinutes += ALLOW_TIME;
@@ -126,42 +190,14 @@
     };
   }
 
-  /* ---------------- TIMER OVERLAY ---------------- */
+  // ---------------- TIMER OVERLAY ----------------
 
   function showTimerOverlay(state) {
     unmuteTab();
-    clearInterval(timerInterval);
 
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:#111;
-      color:white;
-      padding:12px;
-      border-radius:8px;
-      width:220px;
-      font-family:Arial;
-      z-index:999999;
-      box-shadow:0 0 10px rgba(0,0,0,0.5);
-    `;
+    if (timerInterval) return; // 🔒 CRITICAL FIX
 
-    overlay.innerHTML = `
-      <div style="font-size:13px;margin-bottom:6px;">
-        ⏱ Time left: <span id="timeText"></span>
-      </div>
-      <div style="background:#333;height:6px;border-radius:4px;">
-        <div id="bar" style="
-          background:#00ff99;
-          height:6px;
-          width:100%;
-          border-radius:4px;
-        "></div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
+    const overlay = getOrCreateOverlay();
 
     function update() {
       const now = Date.now();
@@ -169,6 +205,7 @@
 
       if (remaining <= 0) {
         clearInterval(timerInterval);
+        timerInterval = null;
         location.reload();
         return;
       }
@@ -179,42 +216,54 @@
       const mins = Math.floor(remaining / 60000);
       const secs = Math.floor((remaining % 60000) / 1000);
 
-      document.getElementById("timeText").textContent =
-        `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      const timeEl = document.getElementById("timeText");
+      const barEl = document.getElementById("bar");
 
-      document.getElementById("bar").style.width = `${percent}%`;
+      if (timeEl && barEl) {
+        timeEl.textContent =
+          `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        barEl.style.width = `${percent}%`;
+      }
     }
 
     update();
     timerInterval = setInterval(update, 1000);
   }
 
-  /* ---------------- CORE CHECK ---------------- */
+  // ---------------- CORE CHECK ----------------
 
   function check() {
     if (!location.pathname.startsWith("/shorts")) return;
 
     loadState((state) => {
-      const now = Date.now();
-
-      if (now < state.allowedUntil) {
+      if (Date.now() < state.allowedUntil) {
         showTimerOverlay(state);
-        return;
+      } else {
+        showBlockedScreen(state);
       }
-
-      showBlockedScreen(state);
     });
   }
 
-  // Initial run
   check();
 
-  // SPA navigation handling
+  // ---------------- SPA HANDLING ----------------
+
   const observer = new MutationObserver(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
       check();
+      return;
     }
+
+    // Restore timer if Shorts removes it
+    loadState((state) => {
+      if (
+        Date.now() < state.allowedUntil &&
+        !document.getElementById("shorts-timer-overlay")
+      ) {
+        showTimerOverlay(state);
+      }
+    });
   });
 
   observer.observe(document, { childList: true, subtree: true });

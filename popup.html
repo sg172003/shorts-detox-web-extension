@@ -5,27 +5,41 @@
   <title>Shorts Detox</title>
   <style>
     body {
+      width: 260px;
+      padding: 14px;
       font-family: Arial, sans-serif;
-      width: 220px;
-      padding: 15px;
       background: #0f0f0f;
-      color: white;
+      color: #fff;
     }
 
     h3 {
-      margin-bottom: 15px;
+      margin: 0 0 12px;
       text-align: center;
     }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
+    .stat {
+      margin-bottom: 10px;
+      font-size: 13px;
     }
 
-    input[type="checkbox"] {
-      transform: scale(1.4);
+    .bar-bg {
+      background: #333;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .bar {
+      height: 8px;
+      background: #00ff99;
+      width: 0%;
+    }
+
+    .muted {
+      color: #aaa;
+      font-size: 12px;
+      margin-top: 8px;
     }
   </style>
 </head>
@@ -33,9 +47,24 @@
 
   <h3>Shorts Detox</h3>
 
-  <div class="row">
-    <span>Block Shorts</span>
-    <input type="checkbox" id="toggle" />
+  <div class="stat">
+    ⏱ Minutes Used: <strong><span id="minutesUsed">0</span> / 15</strong>
+    <div class="bar-bg">
+      <div class="bar" id="minutesBar"></div>
+    </div>
+  </div>
+
+  <div class="stat">
+    ▶ Unlocks Used: <strong><span id="clicksUsed">0</span> / 3</strong>
+  </div>
+
+  <div class="stat">
+    ⏳ Cooldown:
+    <strong><span id="cooldownStatus">None</span></strong>
+  </div>
+
+  <div class="muted">
+    Stay intentional. Small limits build focus.
   </div>
 
   <script src="popup.js"></script>
