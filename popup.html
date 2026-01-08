@@ -5,66 +5,66 @@
   <title>Shorts Detox</title>
   <style>
     body {
-      width: 260px;
+      margin: 0;
       padding: 14px;
-      font-family: Arial, sans-serif;
+      width: 260px;
       background: #0f0f0f;
-      color: #fff;
+      color: white;
+      font-family: Arial, sans-serif;
     }
 
-    h3 {
+    h2 {
       margin: 0 0 12px;
+      font-size: 16px;
       text-align: center;
     }
 
     .stat {
-      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
       font-size: 13px;
     }
 
-    .bar-bg {
-      background: #333;
-      height: 8px;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 6px;
+    .value {
+      font-weight: bold;
     }
 
-    .bar {
-      height: 8px;
-      background: #00ff99;
-      width: 0%;
+    .ok {
+      color: #00ff99;
     }
 
-    .muted {
-      color: #aaa;
-      font-size: 12px;
-      margin-top: 8px;
+    .warn {
+      color: #ffb347;
+    }
+
+    .blocked {
+      color: #ff4d4d;
     }
   </style>
 </head>
 <body>
 
-  <h3>Shorts Detox</h3>
+  <h2>📵 Shorts Detox</h2>
 
   <div class="stat">
-    ⏱ Minutes Used: <strong><span id="minutesUsed">0</span> / 15</strong>
-    <div class="bar-bg">
-      <div class="bar" id="minutesBar"></div>
-    </div>
+    <span>Minutes used</span>
+    <span id="minutes" class="value">--</span>
   </div>
 
   <div class="stat">
-    ▶ Unlocks Used: <strong><span id="clicksUsed">0</span> / 3</strong>
+    <span>Unlocks used</span>
+    <span id="unlocks" class="value">--</span>
   </div>
 
   <div class="stat">
-    ⏳ Cooldown:
-    <strong><span id="cooldownStatus">None</span></strong>
+    <span>Cooldown</span>
+    <span id="cooldown" class="value">--</span>
   </div>
 
-  <div class="muted">
-    Stay intentional. Small limits build focus.
+  <div class="stat">
+    <span>Status</span>
+    <span id="status" class="value">--</span>
   </div>
 
   <script src="popup.js"></script>

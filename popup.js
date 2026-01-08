@@ -1,39 +1,46 @@
 const DAILY_LIMIT = 15;
 const MAX_CLICKS = 3;
 
-function updateUI(state) {
-  const used = state.usedMinutes || 0;
-  const clicks = state.allowClicks || 0;
-
-  document.getElementById("minutesUsed").textContent = used;
-  document.getElementById("clicksUsed").textContent = clicks;
-
-  // Progress bar
-  const percent = Math.min((used / DAILY_LIMIT) * 100, 100);
-  document.getElementById("minutesBar").style.width = percent + "%";
-
-  // Cooldown
-  const now = Date.now();
-  const cooldownEl = document.getElementById("cooldownStatus");
-
-  if (now < state.cooldownUntil) {
-    const mins = Math.ceil((state.cooldownUntil - now) / 60000);
-    cooldownEl.textContent = `${mins} min left`;
-  } else {
-    cooldownEl.textContent = "None";
-  }
+function $(id) {
+  return document.getElementById(id);
 }
 
-// Load state from storage
 chrome.storage.local.get(["shortsState"], (res) => {
-  if (!res.shortsState) {
-    updateUI({
-      usedMinutes: 0,
-      allowClicks: 0,
-      cooldownUntil: 0
-    });
+  const state = res.shortsState;
+
+  if (!state) {
+    $("minutes").textContent = "0 / 15";
+    $("unlocks").textContent = "0 / 3";
+    $("cooldown").textContent = "Ready";
+    $("status").textContent = "Blocked";
+    $("status").className = "value blocked";
     return;
   }
 
-  updateUI(res.shortsState);
+  const now = Date.now();
+
+  // Minutes used
+  $("minutes").textContent = `${state.usedMinutes} / ${DAILY_LIMIT}`;
+
+  // Unlocks
+  $("unlocks").textContent = `${state.allowClicks} / ${MAX_CLICKS}`;
+
+  // Cooldown
+  if (now < state.cooldownUntil) {
+    const mins = Math.ceil((state.cooldownUntil - now) / 60000);
+    $("cooldown").textContent = `${mins} min`;
+    $("cooldown").className = "value warn";
+  } else {
+    $("cooldown").textContent = "Ready";
+    $("cooldown").className = "value ok";
+  }
+
+  // Status
+  if (now < state.allowedUntil) {
+    $("status").textContent = "Allowed";
+    $("status").className = "value ok";
+  } else {
+    $("status").textContent = "Blocked";
+    $("status").className = "value blocked";
+  }
 });
