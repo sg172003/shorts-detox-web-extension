@@ -59,18 +59,18 @@ No ads.
 
 ##🧪 Tested On
 
-Google Chrome (latest)
-YouTube Shorts (SPA)
-Instagram Reels (SPA)
-Desktop environments
+-Google Chrome (latest)
+-YouTube Shorts (SPA)
+-Instagram Reels (SPA)
+-Desktop environments
 
 ##🚀 Future Improvements
 
-Separate limits per platform
-Customizable limits via popup
-Additional platforms (Facebook Reels, etc.)
-Chrome Web Store release
-Analytics: “Time saved today”
+-Separate limits per platform
+-Customizable limits via popup
+-Additional platforms (Facebook Reels, etc.)
+-Chrome Web Store release
+-Analytics: “Time saved today”
 
 
 
