@@ -7,64 +7,118 @@
     body {
       margin: 0;
       padding: 14px;
-      width: 260px;
+      width: 280px;
       background: #0f0f0f;
       color: white;
       font-family: Arial, sans-serif;
     }
 
     h2 {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       font-size: 16px;
       text-align: center;
     }
 
-    .stat {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 13px;
+    .section {
+      margin-bottom: 12px;
     }
 
-    .value {
+    .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
       font-weight: bold;
     }
 
     .ok {
-      color: #00ff99;
-    }
-
-    .warn {
-      color: #ffb347;
+      background: #00ff99;
+      color: #000;
     }
 
     .blocked {
-      color: #ff4d4d;
+      background: #ff4d4d;
+      color: #000;
+    }
+
+    .warn {
+      background: #ffb347;
+      color: #000;
+    }
+
+    .bar {
+      width: 100%;
+      height: 6px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #00ff99;
+      transition: width 0.5s linear;
+    }
+
+    .cooldown-fill {
+      background: #ffb347;
+    }
+
+    .small {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
 
-  <h2>📵 Shorts Detox</h2>
+  <h2>📵 Shorts and Reels Detox</h2>
 
-  <div class="stat">
-    <span>Minutes used</span>
-    <span id="minutes" class="value">--</span>
+  <!-- STATUS -->
+  <div class="section">
+    <div class="row">
+      <span>Status</span>
+      <span id="statusBadge" class="badge">--</span>
+    </div>
   </div>
 
-  <div class="stat">
-    <span>Unlocks used</span>
-    <span id="unlocks" class="value">--</span>
+  <!-- DAILY USAGE -->
+  <div class="section">
+    <div class="row">
+      <span>Daily usage</span>
+      <span id="minutesText">-- / 15</span>
+    </div>
+    <div class="bar">
+      <div id="usageBar" class="bar-fill"></div>
+    </div>
   </div>
 
-  <div class="stat">
-    <span>Cooldown</span>
-    <span id="cooldown" class="value">--</span>
+  <!-- UNLOCKS -->
+  <div class="section">
+    <div class="row">
+      <span>Unlocks used</span>
+      <span id="unlocksText">-- / 3</span>
+    </div>
   </div>
 
-  <div class="stat">
-    <span>Status</span>
-    <span id="status" class="value">--</span>
+  <!-- COOLDOWN -->
+  <div class="section" id="cooldownSection" style="display:none;">
+    <div class="row">
+      <span>Cooldown</span>
+      <span id="cooldownText">--</span>
+    </div>
+    <div class="bar">
+      <div id="cooldownBar" class="bar-fill cooldown-fill"></div>
+    </div>
+    <div class="small">Take a short break 🙂</div>
   </div>
 
   <script src="popup.js"></script>

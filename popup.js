@@ -1,46 +1,57 @@
 const DAILY_LIMIT = 15;
 const MAX_CLICKS = 3;
+const COOLDOWN_MS = 2 * 60 * 1000;
 
 function $(id) {
   return document.getElementById(id);
 }
 
-chrome.storage.local.get(["shortsState"], (res) => {
-  const state = res.shortsState;
+function updateUI() {
+  chrome.storage.local.get(["shortsState"], (res) => {
+    const state = res.shortsState;
+    const now = Date.now();
 
-  if (!state) {
-    $("minutes").textContent = "0 / 15";
-    $("unlocks").textContent = "0 / 3";
-    $("cooldown").textContent = "Ready";
-    $("status").textContent = "Blocked";
-    $("status").className = "value blocked";
-    return;
-  }
+    if (!state) return;
 
-  const now = Date.now();
+    // STATUS
+    if (now < state.allowedUntil) {
+      $("statusBadge").textContent = "Allowed";
+      $("statusBadge").className = "badge ok";
+    } else {
+      $("statusBadge").textContent = "Blocked";
+      $("statusBadge").className = "badge blocked";
+    }
 
-  // Minutes used
-  $("minutes").textContent = `${state.usedMinutes} / ${DAILY_LIMIT}`;
+    // DAILY USAGE
+    $("minutesText").textContent = `${state.usedMinutes} / ${DAILY_LIMIT}`;
+    const usagePercent = Math.min(
+      (state.usedMinutes / DAILY_LIMIT) * 100,
+      100
+    );
+    $("usageBar").style.width = `${usagePercent}%`;
 
-  // Unlocks
-  $("unlocks").textContent = `${state.allowClicks} / ${MAX_CLICKS}`;
+    // UNLOCKS
+    $("unlocksText").textContent = `${state.allowClicks} / ${MAX_CLICKS}`;
 
-  // Cooldown
-  if (now < state.cooldownUntil) {
-    const mins = Math.ceil((state.cooldownUntil - now) / 60000);
-    $("cooldown").textContent = `${mins} min`;
-    $("cooldown").className = "value warn";
-  } else {
-    $("cooldown").textContent = "Ready";
-    $("cooldown").className = "value ok";
-  }
+    // COOLDOWN
+    if (now < state.cooldownUntil) {
+      $("cooldownSection").style.display = "block";
 
-  // Status
-  if (now < state.allowedUntil) {
-    $("status").textContent = "Allowed";
-    $("status").className = "value ok";
-  } else {
-    $("status").textContent = "Blocked";
-    $("status").className = "value blocked";
-  }
-});
+      const remaining = state.cooldownUntil - now;
+      const mins = Math.ceil(remaining / 60000);
+      $("cooldownText").textContent = `${mins} min`;
+
+      const percent =
+        ((COOLDOWN_MS - remaining) / COOLDOWN_MS) * 100;
+      $("cooldownBar").style.width = `${percent}%`;
+    } else {
+      $("cooldownSection").style.display = "none";
+    }
+  });
+}
+
+// Initial render
+updateUI();
+
+// Live updates
+setInterval(updateUI, 1000);
