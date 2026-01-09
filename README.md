@@ -1,39 +1,83 @@
-# Shorts Detox 🚫📱
+# 📵 Shorts Detox – Control Short-Form Content Consumption
 
-A Chrome Extension to reduce mindless consumption of short-form content like **YouTube Shorts**.
+**Shorts Detox** is a Chrome extension that helps you **reduce excessive consumption of short-form video content** like **YouTube Shorts** and **Instagram Reels** by enforcing **daily time limits, cooldowns, and intentional breaks**.
+
+This extension is designed to be:
+- 🚀 Lightweight
+- 🧠 Behavior-focused (not aggressive blocking)
+- 🧩 SPA-safe (works smoothly on modern web apps)
+- 📊 Transparent with live usage stats
+
+
 
 ## ✨ Features
-- Blocks YouTube Shorts by default
-- Daily limit: **15 minutes**
-- Unlock Shorts only **3 times per day (5 min each)**
-- Cooldown after each session
-- Countdown timer + progress bar
-- Browser-level tab mute (no background audio)
-- SPA-safe (works with YouTube navigation)
 
-## 🧠 Why?
-Short-form content is addictive.  
-This extension enforces **intentional consumption** instead of endless scrolling.
+### ⏱ Smart Time Limiting
+- **15 minutes/day** total limit (configurable in code)
+- **5 minutes per unlock**
+- Maximum **3 unlocks per day**
 
-## 🛠 Tech Stack
-- JavaScript (Vanilla)
-- Chrome Extension APIs (Manifest v3)
-- `chrome.storage.local`
-- Background Service Worker
+### ⛔ Intelligent Blocking
+- Shorts/Reels are **blocked by default**
+- Full-screen overlay prevents accidental consumption
+- Audio is fully muted when blocked
 
-## 📦 Installation (Developer Mode)
-1. Clone this repo
-2. Open `chrome://extensions`
-3. Enable **Developer mode**
-4. Click **Load unpacked**
-5. Select the project folder
+### 🔄 Cooldown Mechanism
+- **2-minute cooldown** after each 5-minute session
+- Unlock button is disabled during cooldown
+- Automatically re-enabled when cooldown ends (no refresh needed)
 
-## 🚀 Future Plans
-- Instagram Reels blocking
-- Popup usage analytics
-- Soft mode (warnings instead of hard block)
-- Chrome Web Store release
+### 📊 Live Popup Dashboard
+- Daily usage progress bar
+- Unlocks used / remaining
+- Cooldown progress indicator
+- Real-time status: **Allowed / Blocked**
+- Updates every second while popup is open
 
----
+### 🎯 Supported Platforms
+- ✅ YouTube Shorts
+- ✅ Instagram Reels (full-screen only)
 
-Built with focus & discipline 💪
+
+
+## 🧠 How It Works (High-Level)
+
+1. When you open Shorts/Reels:
+   - Content is blocked immediately
+   - Audio is muted
+2. You must **intentionally click “Allow 5 minutes”**
+3. During allowed time:
+   - Timer & progress bar are shown
+4. After time expires:
+   - Content is blocked again
+   - Cooldown is enforced
+5. All usage data is stored locally in Chrome
+
+No servers.  
+No tracking.  
+No ads.
+
+##🧪 Tested On
+
+-Google Chrome (latest)
+
+-YouTube Shorts (SPA)
+
+-Instagram Reels (SPA)
+
+-Desktop environments
+
+##🚀 Future Improvements
+
+-Separate limits per platform
+
+-Customizable limits via popup
+
+-Additional platforms (Facebook Reels, etc.)
+
+-Chrome Web Store release
+
+-Analytics: “Time saved today”
+
+
+
