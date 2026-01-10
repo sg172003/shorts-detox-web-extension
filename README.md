@@ -75,9 +75,10 @@ No ads.
 
 -Additional platforms (Facebook Reels, etc.)
 
--Chrome Web Store release
 
 -Analytics: “Time saved today”
+
+This extension does not collect, store, or transmit any user data.
 
 
 
